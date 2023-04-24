@@ -1,6 +1,9 @@
+using Moq;
 using Sat.Recruitment.Api.Models;
 using Sat.Recruitment.Api.Services;
 using Sat.Recruitment.Api.Services.Interface;
+using Sat.Recruitment.Api.Services.Validators;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Sat.Recruitment.Test.Services
@@ -9,95 +12,58 @@ namespace Sat.Recruitment.Test.Services
     public class ValidationServiceTests
 	{
 		private readonly IValidationService _validationService;
+		private readonly Mock<IUserDuplicationValidator> _userDuplicationValidator;
+		private readonly Mock<IEmailNormalizer> _emailNormalizer;
+		private readonly Mock<IMoneyPercentageCalculator> _moneyPercentageCalculator;
+
 
 		public ValidationServiceTests()
 		{
-			_validationService = new ValidationService();
-		}
-
-		[Theory]
-		[InlineData("user@example.com", "user@example.com")]
-		[InlineData("user.email@example.com", "useremail@example.com")]
-		[InlineData("user.email+ @example.com", "useremail@example.com")]
-		public void NormalizeEmail_ShouldNormalizeEmail(string originalEmail, string expectedEmail)
-		{
-			// Arrange
-
-			// Act
-			var normalizedEmail = _validationService.NormalizeEmail(originalEmail);
-
-			// Assert
-			Assert.Equal(expectedEmail, normalizedEmail);
+			_userDuplicationValidator = new Mock<IUserDuplicationValidator>();
+			_emailNormalizer = new Mock<IEmailNormalizer>();
+			_moneyPercentageCalculator = new Mock<IMoneyPercentageCalculator>();
+			_validationService = new ValidationService(_userDuplicationValidator.Object, _emailNormalizer.Object, _moneyPercentageCalculator.Object);
 		}
 
 		[Fact]
-		public void CalculateMoneyPercentage_WhenUserTypeIsNormalAndMoneyGreaterThan100_ShouldReturnMoneyIncreasedBy12Percent()
+		public void EmailNormalizer_Should_Be_Called()
+		{
+			// Arrange
+			var user = new User { Email = "test@test.com" };
+
+			// Act
+			var result = _validationService.NormalizeEmail(user.Email);
+
+			// Assert
+			_emailNormalizer.Verify(x => x.NormalizeEmail(It.IsAny<string>()), Times.Once);
+		}
+
+		[Fact]
+		public void MoneyPercentageCalculator_Should_Be_Called()
 		{
 			// Arrange
 			var user = new User { Money = 200, UserType = "Normal" };
-			var expectedMoney = 224m;
 
 			// Act
 			var result = _validationService.CalculateMoneyPercentage(user);
 
 			// Assert
-			Assert.Equal(expectedMoney, result);
+			_moneyPercentageCalculator.Verify(x => x.CalculateMoneyPercentage(It.IsAny<User>()), Times.Once);
 		}
 
 		[Fact]
-		public void CalculateMoneyPercentage_WhenUserTypeIsNormalAndMoneyBetween10And100_ShouldReturnMoneyIncreasedBy8Percent()
+		public void UserDuplicationValidator_Should_Be_Called()
 		{
 			// Arrange
-			var user = new User { Money = 50, UserType = "Normal" };
-			var expectedMoney = 54m;
+			var user = new User { Money = 200, UserType = "Normal", Email = "test@test.com" };
+			List<User> users = new List<User>();
 
 			// Act
-			var result = _validationService.CalculateMoneyPercentage(user);
+			var result = _validationService.IsDuplicated(users, user);
 
 			// Assert
-			Assert.Equal(expectedMoney, result);
+			_userDuplicationValidator.Verify(x => x.IsDuplicated(It.IsAny<List<User>>(), It.IsAny<User>()), Times.Once);
 		}
 
-		[Fact]
-		public void CalculateMoneyPercentage_WhenUserTypeIsSuperUserAndMoneyGreaterThan100_ShouldReturnMoneyIncreasedBy20Percent()
-		{
-			// Arrange
-			var user = new User { Money = 200, UserType = "SuperUser" };
-			var expectedMoney = 240m;
-
-			// Act
-			var result = _validationService.CalculateMoneyPercentage(user);
-
-			// Assert
-			Assert.Equal(expectedMoney, result);
-		}
-
-		[Fact]
-		public void CalculateMoneyPercentage_WhenUserTypeIsPremiumAndMoneyGreaterThan100_ShouldReturnMoneyIncreasedBy200Percent()
-		{
-			// Arrange
-			var user = new User { Money = 200, UserType = "Premium" };
-			var expectedMoney = 600m;
-
-			// Act
-			var result = _validationService.CalculateMoneyPercentage(user);
-
-			// Assert
-			Assert.Equal(expectedMoney, result);
-		}
-
-		[Fact]
-		public void CalculateMoneyPercentage_WhenUserTypeIsNotNormalSuperUserOrPremium_ShouldReturnSameMoney()
-		{
-			// Arrange
-			var user = new User { Money = 50, UserType = "SomeOtherType" };
-			var expectedMoney = 50m;
-
-			// Act
-			var result = _validationService.CalculateMoneyPercentage(user);
-
-			// Assert
-			Assert.Equal(expectedMoney, result);
-		}
 	}
 }
