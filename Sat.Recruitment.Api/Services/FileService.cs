@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Sat.Recruitment.Api.Services
 {
-    public partial class FileReaderService : IFileReaderService
+    public partial class FileService : IFileService
     {
-		public FileReaderService()
+		public FileService()
 		{
 		}
 

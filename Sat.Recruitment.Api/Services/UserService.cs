@@ -10,10 +10,10 @@ namespace Sat.Recruitment.Api.Services
     public class UserService : IUserService
     {
 
-		private readonly IFileReaderService _fileReaderService;
+		private readonly IFileService _fileReaderService;
 		private readonly IValidationService _validationService;
 
-		public UserService(IFileReaderService fileReaderService,
+		public UserService(IFileService fileReaderService,
 			IValidationService validationService)
 		{
 			_fileReaderService = fileReaderService ?? throw new ArgumentNullException(nameof(fileReaderService)); ;

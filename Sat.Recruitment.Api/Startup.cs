@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sat.Recruitment.Api.Services.Interface;
 using Sat.Recruitment.Api.Services;
+using Sat.Recruitment.Api.Services.Validators;
 
 namespace Sat.Recruitment.Api
 {
@@ -23,7 +24,12 @@ namespace Sat.Recruitment.Api
             services.AddControllers();
             services.AddSwaggerGen();
 			services.AddScoped<IValidationService, ValidationService>();
-			services.AddScoped<IFileReaderService, FileReaderService>();
+			services.AddScoped<IFileService, FileService>();
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IEmailNormalizer, EmailNormalizer>();
+			services.AddScoped<IMoneyPercentageCalculator, MoneyPercentageCalculator>();
+			services.AddScoped<IUserDuplicationValidator, UserDuplication>();
+
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

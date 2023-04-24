@@ -12,13 +12,13 @@ namespace Sat.Recruitment.Test.Services
     [CollectionDefinition("ValidationTests", DisableParallelization = true)]
     public class UserServiceTests
 	{
-		private readonly Mock<IFileReaderService> _fileReaderService;
+		private readonly Mock<IFileService> _fileReaderService;
 		private readonly Mock<IValidationService> _validationService;
 		private readonly IUserService _userService;
 
 		public UserServiceTests()
 		{
-			_fileReaderService = new Mock<IFileReaderService>();
+			_fileReaderService = new Mock<IFileService>();
 			_validationService = new Mock<IValidationService>();
 			_userService = new UserService(_fileReaderService.Object, _validationService.Object);
 		}

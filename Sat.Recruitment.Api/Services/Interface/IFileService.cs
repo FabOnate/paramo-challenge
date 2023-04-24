@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Sat.Recruitment.Api.Services.Interface
 {
-    public interface IFileReaderService
+    public interface IFileService
     {
 		Task<IList<User>> ReadUsersFromFile();
 		void WriteFile(User user);

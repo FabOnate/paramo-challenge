@@ -23,7 +23,7 @@ namespace Sat.Recruitment.Test.Services
 		public async Task ReadUsersFromFile_ShouldReturnListOfUsers_WhenFileExists()
 		{
 			// Arrange
-			var _fileReaderService = new FileReaderService();
+			var _fileReaderService = new FileService();
 
 			// Act
 			var users = await _fileReaderService.ReadUsersFromFile();
@@ -37,7 +37,7 @@ namespace Sat.Recruitment.Test.Services
 		[Fact]
 		public void WriteFile_ShouldAppendToFile_WhenValidUserProvided()
 		{
-			var _fileReaderService = new FileReaderService();
+			var _fileReaderService = new FileService();
 			// Arrange
 			var user = new User
 			{
@@ -73,7 +73,7 @@ namespace Sat.Recruitment.Test.Services
 			currentDir = Environment.CurrentDirectory;
 			Environment.CurrentDirectory = tempDir;
 
-			var _fileReaderService = new FileReaderService();
+			var _fileReaderService = new FileService();
 			// Act & Assert
 			try
 			{
